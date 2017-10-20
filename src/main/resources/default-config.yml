@@ -1,0 +1,9 @@
+producers:
+  twitter:
+    auth:
+      oauthAccessTokenSecret:
+      oauthAccessToken:
+      oauthConsumerSecret:
+      oauthConsumerKey:
+    users:
+      - shitpostbot5000

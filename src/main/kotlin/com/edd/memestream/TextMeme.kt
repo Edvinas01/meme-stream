@@ -1,4 +1,4 @@
-package com.edd.meme_stream
+package com.edd.memestream
 
 data class TextMeme(
         val text: String

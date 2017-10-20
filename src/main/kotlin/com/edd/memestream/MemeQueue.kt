@@ -1,4 +1,4 @@
-package com.edd.meme_stream
+package com.edd.memestream
 
 import kotlin.reflect.KClass
 
