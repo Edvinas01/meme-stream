@@ -6,7 +6,6 @@ group 'doggo-bot'
 buildscript {
     ext {
         twitter4jVersion = '4.0.6'
-        snakeYamlVersion = '1.19'
         jacksonVersion = '2.9.2'
         kotlinVersion = '1.1.51'
     }
@@ -26,11 +25,9 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     compile "org.twitter4j:twitter4j-core:$twitter4jVersion"
-    compile "org.yaml:snakeyaml:$snakeYamlVersion"
 
-
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
 }
 
 compileKotlin {

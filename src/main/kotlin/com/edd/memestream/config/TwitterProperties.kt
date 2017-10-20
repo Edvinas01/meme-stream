@@ -1,6 +1,6 @@
 package com.edd.memestream.config
 
-data class TwitterProducer(
+data class TwitterProperties(
         val auth: Auth,
         val users: List<String>
 ) : Properties
