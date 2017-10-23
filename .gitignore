@@ -7,3 +7,5 @@ out/
 *.iml
 
 gradle/wrapper/gradle-wrapper.properties
+
+config.yml

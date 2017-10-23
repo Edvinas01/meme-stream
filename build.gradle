@@ -8,6 +8,7 @@ buildscript {
         twitter4jVersion = '4.0.6'
         jacksonVersion = '2.9.2'
         kotlinVersion = '1.1.51'
+        slf4jVersion = '1.7.25'
     }
     repositories {
         mavenCentral()
@@ -22,12 +23,18 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
+    // Core dependencies.
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile "org.twitter4j:twitter4j-core:$twitter4jVersion"
 
+    // JSON and Yaml parsing dependencies.
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+
+    // Logging dependencies.
+    compile "org.slf4j:slf4j-simple:$slf4jVersion"
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
 }
 
 compileKotlin {
