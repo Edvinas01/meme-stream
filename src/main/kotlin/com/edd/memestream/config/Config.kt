@@ -18,38 +18,41 @@ object Config {
     private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule())
     private val log = LoggerFactory.getLogger(Config::class.java)
 
-    private val rootProperties: RootProperties
+    private val root: RootProperties
 
     init {
-        rootProperties = loadAndHandle()
+        root = loadAndHandle()
     }
 
     @Suppress("UNCHECKED_CAST")
     operator fun <T : Properties> get(type: Class<T>): T? {
-        if (type == TwitterProperties::class.java) {
-            return rootProperties.producers?.twitter as T
+        return when (type) {
+            ExecutorProperties::class.java -> root.executors as T
+            TwitterProperties::class.java -> root.modules?.twitter as T
+            DbProperties::class.java -> root.db as T
+            else -> null
         }
-        return null
     }
 
     /**
      * Load root properties and handle all exceptions.
      */
     private fun loadAndHandle(): RootProperties {
+        var props: RootProperties? = null
         try {
-            return load()
+            props = load()
         } catch (e: MissingKotlinParameterException) {
             log.error("Required parameter at ${getPath(e)} in $CONFIG file is not set")
         } catch (e: MismatchedInputException) {
             log.error("Parameter at ${getPath(e)} is incorrect type, expected: ${e.targetType}")
         }
-        throw exitProcess(-1)
+        return props ?: exitProcess(-1)
     }
 
     /**
      * Load root properties from external file or default config.
      */
-    private fun load(): RootProperties {
+    private fun load(): RootProperties? {
         val config = File(CONFIG)
 
         if (!config.exists()) {
@@ -58,7 +61,7 @@ object Config {
             return getDefaultBytes().let { b ->
                 config.createNewFile()
                 config.writeBytes(b)
-                load(b)
+                null
             }
         }
 
@@ -68,7 +71,7 @@ object Config {
 
             return getDefaultBytes().let { b ->
                 config.writeBytes(b)
-                load(b)
+                null
             }
         }
         return load(bytes)
@@ -100,12 +103,14 @@ object Config {
  * Wrapper class for all properties.
  */
 private data class RootProperties(
-        val producers: Producers?
+        val executors: ExecutorProperties,
+        val modules: ModuleProperties?,
+        val db: DbProperties
 )
 
 /**
- * Wrapper class for all producers.
+ * Wrapper class for all modules.
  */
-private data class Producers(
+private data class ModuleProperties(
         val twitter: TwitterProperties?
 )

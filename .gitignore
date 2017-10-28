@@ -8,4 +8,6 @@ out/
 
 gradle/wrapper/gradle-wrapper.properties
 
+# Files created at run-time.
 config.yml
+data.db

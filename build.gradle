@@ -9,6 +9,7 @@ buildscript {
         jacksonVersion = '2.9.2'
         kotlinVersion = '1.1.51'
         slf4jVersion = '1.7.25'
+        mapDbVersion = '3.0.5'
     }
     repositories {
         mavenCentral()
@@ -27,6 +28,9 @@ dependencies {
     // Core dependencies.
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     compile "org.twitter4j:twitter4j-core:$twitter4jVersion"
+
+    // Storage.
+    compile "org.mapdb:mapdb:$mapDbVersion"
 
     // JSON and Yaml parsing dependencies.
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"

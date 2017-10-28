@@ -1,41 +1,28 @@
 package com.edd.memestream
 
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import com.edd.memestream.config.Config
+import com.edd.memestream.config.TwitterProperties
+import com.edd.memestream.executors.Scheduler
+import com.edd.memestream.storage.RepositoryFactory
+import twitter4j.TwitterFactory
+import twitter4j.conf.ConfigurationBuilder
 
 fun main(args: Array<String>) {
+    val repositories = RepositoryFactory()
+    val scheduler = Scheduler()
 
-    val repository = MemoryMemeQueue()
-    val executor = Executors.newScheduledThreadPool(6)
+    Config[TwitterProperties::class.java]?.apply {
 
-    // Producers.
-    val imageProducer = Runnable {
-        repository.add(RemoteImageMeme("Image"))
-    }
+        val twitter = TwitterFactory(ConfigurationBuilder()
+                .setOAuthAccessTokenSecret(auth.oauthAccessTokenSecret)
+                .setOAuthAccessToken(auth.oauthAccessToken)
+                .setOAuthConsumerSecret(auth.oauthConsumerSecret)
+                .setOAuthConsumerKey(auth.oauthConsumerKey)
+                .build()
+        ).instance
 
-    val textProducer = Runnable {
-        repository.add(TextMeme("Text"))
-    }
-
-    executor.scheduleAtFixedRate(imageProducer, 0, 10, TimeUnit.SECONDS)
-    executor.scheduleAtFixedRate(textProducer, 0, 10, TimeUnit.SECONDS)
-
-    // Consumers.
-    val imageConsumer = Runnable {
-        repository.poll(RemoteImageMeme::class)?.let {
-            println(it)
+        for (user in users) {
+            println(twitter.showUser(user).status.text)
         }
     }
-
-    val textConsumer = Runnable {
-        repository.poll(TextMeme::class)?.let {
-            println(it)
-        }
-    }
-
-    executor.scheduleAtFixedRate(imageConsumer, 0, 2, TimeUnit.SECONDS)
-    executor.scheduleAtFixedRate(imageConsumer, 0, 2, TimeUnit.SECONDS)
-
-    executor.scheduleAtFixedRate(textConsumer, 0, 2, TimeUnit.SECONDS)
-    executor.scheduleAtFixedRate(textConsumer, 0, 2, TimeUnit.SECONDS)
 }

@@ -1,4 +1,6 @@
-producers:
+modules:
+
+  # Twitter module pulls data from various twitter users and stores it in db.
   twitter:
     auth:
       oauthAccessTokenSecret:
@@ -8,3 +10,14 @@ producers:
     users: [
       shitpostbot5000
     ]
+
+# Thread executor configurations, tweak according to system resources and desired performance.
+executors:
+  producers:
+    poolSize: 2
+  consumers:
+    poolSize: 2
+
+# Database path, which is used to store data during and after application shutdowns.
+db:
+  path: data.db
