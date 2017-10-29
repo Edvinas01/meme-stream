@@ -2,7 +2,7 @@ package com.edd.memestream.storage
 
 import org.mapdb.BTreeMap
 
-class Repository<in K, V>(private val map: BTreeMap<K, V>) {
+open class Repository<in K, V>(private val map: BTreeMap<K, V>) {
 
     /**
      * Save a single object.

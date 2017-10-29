@@ -2,22 +2,30 @@ modules:
 
   # Twitter module pulls data from various twitter users and stores it in db.
   twitter:
+
+    # Twitter developer authentication keys.
     auth:
       oauthAccessTokenSecret:
       oauthAccessToken:
       oauthConsumerSecret:
       oauthConsumerKey:
+
+    # How often to pull data from each user.
+    intervalMillis: 60000
+
+    # Users to pull data from.
     users: [
       shitpostbot5000
     ]
 
+  # Simple module used for testing purposes.
+  printing:
+    intervalMillis: 1000
+
 # Thread executor configurations, tweak according to system resources and desired performance.
 executors:
-  producers:
-    poolSize: 2
-  consumers:
-    poolSize: 2
+  poolSize: 2
 
-# Database path, which is used to store data during and after application shutdowns.
+# Database path which is used to store data during and after application shutdowns.
 db:
   path: data.db

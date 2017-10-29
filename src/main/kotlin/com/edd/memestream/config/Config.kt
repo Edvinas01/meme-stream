@@ -1,7 +1,6 @@
 package com.edd.memestream.config
 
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -13,78 +12,68 @@ import kotlin.system.exitProcess
 object Config {
 
     private const val DEFAULT_CONFIG = "default-config.yml"
+    private const val MODULES = "modules"
     private const val CONFIG = "config.yml"
 
-    private val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule())
+    private val mapper = ObjectMapper(YAMLFactory())
+            .registerModule(KotlinModule())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
     private val log = LoggerFactory.getLogger(Config::class.java)
 
-    private val root: RootProperties
+    private val moduleTree: JsonNode
+    private val modules: MutableMap<Class<*>, Any> = mutableMapOf()
+
+    val executors: ExecutorProperties
+    val db: DbProperties
 
     init {
-        root = loadAndHandle()
+        val tree = mapper.readTree(loadBytes())
+        moduleTree = tree.path(MODULES)
+
+        val root = read(tree, RootProperties::class.java) ?: exitProcess(-1)
+        executors = root.executors
+        db = root.db
     }
 
-    @Suppress("UNCHECKED_CAST")
-    operator fun <T : Properties> get(type: Class<T>): T? {
-        return when (type) {
-            ExecutorProperties::class.java -> root.executors as T
-            TwitterProperties::class.java -> root.modules?.twitter as T
-            DbProperties::class.java -> root.db as T
-            else -> null
+    /**
+     * Register a new module configuration.
+     */
+    fun <T> register(name: String, type: Class<T>): T? {
+        val module = read(moduleTree.path(name), type, "$MODULES.$name.")
+        if (module != null) {
+            modules.put(type, module)
+        } else {
+            log.debug("Module \"$name\" was not loaded")
+        }
+        return module
+    }
+
+    /**
+     * Get module configuration.
+     */
+    fun <T> getModule(type: Class<T>): T? {
+        return modules[type]?.let {
+            if (type.isAssignableFrom(it.javaClass)) {
+                type.cast(it)
+            } else {
+                null
+            }
         }
     }
 
     /**
-     * Load root properties and handle all exceptions.
+     * Load provided configuration type and handle all exceptions.
      */
-    private fun loadAndHandle(): RootProperties {
-        var props: RootProperties? = null
+    private fun <T> read(tree: JsonNode, type: Class<T>, prefix: String = ""): T? {
         try {
-            props = load()
+            return mapper.treeToValue(tree, type)
         } catch (e: MissingKotlinParameterException) {
-            log.error("Required parameter at ${getPath(e)} in $CONFIG file is not set")
+            log.error("Required parameter [${prefix + getPath(e)}] in $CONFIG file is not set")
         } catch (e: MismatchedInputException) {
-            log.error("Parameter at ${getPath(e)} is incorrect type, expected: ${e.targetType}")
+            log.error("Parameter [${prefix + getPath(e)}] is incorrect type, expected: ${e.targetType}")
         }
-        return props ?: exitProcess(-1)
-    }
-
-    /**
-     * Load root properties from external file or default config.
-     */
-    private fun load(): RootProperties? {
-        val config = File(CONFIG)
-
-        if (!config.exists()) {
-            log.debug("$CONFIG does not exist, creating default config file")
-
-            return getDefaultBytes().let { b ->
-                config.createNewFile()
-                config.writeBytes(b)
-                null
-            }
-        }
-
-        val bytes = config.readBytes()
-        if (bytes.isEmpty()) {
-            log.debug("$CONFIG is empty, copying default config file contents")
-
-            return getDefaultBytes().let { b ->
-                config.writeBytes(b)
-                null
-            }
-        }
-        return load(bytes)
-    }
-
-    /**
-     * Load root properties from byte array.
-     */
-    private fun load(bytes: ByteArray): RootProperties {
-        return mapper.readValue<RootProperties>(
-                bytes,
-                RootProperties::class.java
-        )
+        return null
     }
 
     /**
@@ -97,20 +86,32 @@ object Config {
      * Get problematic param path from json exception.
      */
     private fun getPath(e: JsonMappingException) = e.path.joinToString(".") { it.fieldName }
+
+    /**
+     * Load configuration file content as bytes.
+     */
+    private fun loadBytes(): ByteArray {
+        val config = File(CONFIG)
+
+        if (!config.exists()) {
+            log.debug("$CONFIG does not exist, creating default config file")
+
+            return getDefaultBytes().let { b ->
+                config.createNewFile()
+                config.writeBytes(b)
+                b
+            }
+        }
+
+        val bytes = config.readBytes()
+        if (bytes.isEmpty()) {
+            log.debug("$CONFIG is empty, copying default config file contents")
+
+            return getDefaultBytes().let { b ->
+                config.writeBytes(b)
+                b
+            }
+        }
+        return bytes
+    }
 }
-
-/**
- * Wrapper class for all properties.
- */
-private data class RootProperties(
-        val executors: ExecutorProperties,
-        val modules: ModuleProperties?,
-        val db: DbProperties
-)
-
-/**
- * Wrapper class for all modules.
- */
-private data class ModuleProperties(
-        val twitter: TwitterProperties?
-)
