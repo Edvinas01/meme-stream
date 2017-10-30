@@ -3,12 +3,12 @@ package com.edd.memestream.storage
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.mapdb.DataInput2
 import org.mapdb.DataOutput2
-import org.mapdb.serializer.GroupSerializerObjectArray
+import org.mapdb.Serializer
 
-class JsonGroupSerializer<T>(
+class JsonSerializer<T>(
         private val mapper: ObjectMapper,
         private val type: Class<T>
-) : GroupSerializerObjectArray<T>() {
+) : Serializer<T> {
 
     override fun serialize(out: DataOutput2, value: T) {
         out.writeUTF(mapper.writeValueAsString(value))

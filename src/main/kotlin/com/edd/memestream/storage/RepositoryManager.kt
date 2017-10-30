@@ -7,23 +7,36 @@ import org.mapdb.DB
 import org.mapdb.DBMaker
 import org.mapdb.Serializer
 
-class RepositoryFactory {
+class RepositoryManager {
 
     private companion object {
         const val SIMPLE_REPOSITORY = "simple-memes"
+        const val LOCAL_PREFIX = "local-"
     }
 
     private val mapper = ObjectMapper().registerModule(KotlinModule())
     private val db = createDb()
 
+    val simple = simple()
+
+    /**
+     * Factorize a local storage repository.
+     */
+    fun <T> local(moduleType: Class<*>, valueType: Class<T>): LocalStorageRepository<T> {
+        return LocalStorageRepository(db
+                .hashMap(LOCAL_PREFIX + moduleType.name)
+                .valueSerializer(JsonSerializer(mapper, valueType))
+                .keySerializer(Serializer.STRING)
+                .createOrOpen()
+        )
+    }
+
     /**
      * Factorize a simple repository.
      */
-    fun simple(): SimpleMemeRepository {
+    private fun simple(): SimpleMemeRepository {
         return SimpleMemeRepository(db
-                .treeMap(SIMPLE_REPOSITORY)
-                .valueSerializer(JsonGroupSerializer(mapper, SimpleMeme::class.java))
-                .keySerializer(Serializer.STRING)
+                .indexTreeList(SIMPLE_REPOSITORY, JsonSerializer(mapper, SimpleMeme::class.java))
                 .createOrOpen()
         )
     }
