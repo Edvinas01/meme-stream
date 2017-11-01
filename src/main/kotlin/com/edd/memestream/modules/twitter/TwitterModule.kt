@@ -39,25 +39,28 @@ class TwitterModule(
 
             executor.schedule(Runnable {
                 val state = getState() ?: TwitterState(mutableMapOf())
-                val store = mutableListOf<SimpleMeme>()
+                val pending = mutableListOf<SimpleMeme>()
 
                 for (user in users) {
                     with(twitter.showUser(user).status) {
-                        val meme = SimpleMeme(text)
+                        mediaEntities.map {
+                            SimpleMeme(it.mediaURL)
+                        }.firstOrNull()?.let { meme ->
 
-                        if (state.previousUserMeme[user] != meme) {
-                            state.previousUserMeme[user] = meme
-                            store += meme
+                            if (state.previousUserMeme[user] != meme) {
+                                state.previousUserMeme[user] = meme
+                                pending += meme
+                            }
                         }
                     }
                 }
 
                 setState(state)
 
-                if (store.isNotEmpty()) {
-                    log.debug("Storing store $store")
+                if (pending.isNotEmpty()) {
+                    log.debug("Storing $pending")
                 }
-                memeRepository += store
+                memeRepository += pending
             }, intervalMillis)
         }
     }
