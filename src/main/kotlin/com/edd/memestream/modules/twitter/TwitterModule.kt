@@ -2,7 +2,7 @@ package com.edd.memestream.modules.twitter
 
 import com.edd.memestream.config.Config
 import com.edd.memestream.executors.Executor
-import com.edd.memestream.modules.Module
+import com.edd.memestream.modules.StatefulModule
 import com.edd.memestream.storage.RepositoryManager
 import com.edd.memestream.storage.SimpleMeme
 import org.slf4j.LoggerFactory
@@ -12,20 +12,19 @@ import twitter4j.conf.ConfigurationBuilder
 class TwitterModule(
         private val executor: Executor,
         repositories: RepositoryManager
-) : Module {
+) : StatefulModule<TwitterState>(
+        repositories,
+        TwitterState::class.java
+) {
 
     private companion object {
-        const val STATE = "state"
-        const val NAME = "twitter"
-
         private val log = LoggerFactory.getLogger(TwitterModule::class.java)
 
         init {
-            Config.register(NAME, TwitterProperties::class.java)
+            Config.register("twitter", TwitterProperties::class.java)
         }
     }
 
-    private val stateRepository = repositories.local(this::class.java, TwitterState::class.java)
     private val memeRepository = repositories.simple
 
     override fun start() {
@@ -39,22 +38,26 @@ class TwitterModule(
             ).instance
 
             executor.schedule(Runnable {
-                val state = stateRepository[STATE] ?: TwitterState(mutableSetOf())
+                val state = getState() ?: TwitterState(mutableMapOf())
+                val store = mutableListOf<SimpleMeme>()
 
                 for (user in users) {
                     with(twitter.showUser(user).status) {
                         val meme = SimpleMeme(text)
-                        if (!state.previous.contains(meme)) {
-                            log.debug("Storing $meme")
 
-                            memeRepository += meme
-                            state.previous.add(meme)
-                        } else {
-                            log.debug("$meme was stored previously")
+                        if (state.previousUserMeme[user] != meme) {
+                            state.previousUserMeme[user] = meme
+                            store += meme
                         }
                     }
                 }
-                stateRepository[STATE] = state
+
+                setState(state)
+
+                if (store.isNotEmpty()) {
+                    log.debug("Storing store $store")
+                }
+                memeRepository += store
             }, intervalMillis)
         }
     }
