@@ -15,4 +15,8 @@ If you're on Windows:
 gradlew.bat build
 ```
 
-Then make your changes and submit your pull request.
+Then make your changes, test them out and submit your pull request.
+
+Some things to consider:
+* No code style is enforced as long as existing files are not altered.
+* Tests are not required but are welcome.
