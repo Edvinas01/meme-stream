@@ -1,13 +1,19 @@
+# Common gradle ignores.
+gradle/wrapper/gradle-wrapper.properties
 .gradle/
 .idea/
 
+# Build output directories.
 build/
 out/
 
+# Idea files.
 *.iml
 
-gradle/wrapper/gradle-wrapper.properties
-
-# Files created at run-time.
+# Config and storage files created at run-time.
 config.yml
+data.db.wal.*
 data.db
+
+# Logging directory.
+logs/

@@ -2,30 +2,21 @@ package com.edd.memestream.modules.twitter
 
 import com.edd.memestream.config.Config
 import com.edd.memestream.executors.Executor
-import com.edd.memestream.modules.StatefulModule
-import com.edd.memestream.storage.RepositoryManager
+import com.edd.memestream.modules.api.SimpleModule
 import com.edd.memestream.storage.SimpleMeme
-import org.slf4j.LoggerFactory
+import mu.KLogging
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
 
 class TwitterModule(
-        private val executor: Executor,
-        repositories: RepositoryManager
-) : StatefulModule<TwitterState>(
-        repositories,
-        TwitterState::class.java
-) {
+        private val executor: Executor
+) : SimpleModule<TwitterState>(TwitterState::class.java) {
 
-    private companion object {
-        private val log = LoggerFactory.getLogger(TwitterModule::class.java)
-
+    private companion object : KLogging() {
         init {
             Config.register("twitter", TwitterProperties::class.java)
         }
     }
-
-    private val memeRepository = repositories.simple
 
     override fun start() {
         Config.getModule(TwitterProperties::class.java)?.apply {
@@ -58,9 +49,9 @@ class TwitterModule(
                 setState(state)
 
                 if (pending.isNotEmpty()) {
-                    log.debug("Storing $pending")
+                    logger.debug { "Storing $pending" }
                 }
-                memeRepository += pending
+                simpleMemeRepository += pending
             }, intervalMillis)
         }
     }

@@ -10,9 +10,10 @@ fun main(args: Array<String>) {
     val executor = Executor()
 
     listOf(
-            PrintingModule(executor, repositories),
-            TwitterModule(executor, repositories)
+            PrintingModule(executor),
+            TwitterModule(executor)
     ).forEach({
+        it.initRepositories(repositories)
         it.start()
     })
 }

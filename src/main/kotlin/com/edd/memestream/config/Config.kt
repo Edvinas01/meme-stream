@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import mu.KLogging
 import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.system.exitProcess
 
-object Config {
+object Config : KLogging() {
 
     private const val DEFAULT_CONFIG = "default-config.yml"
     private const val MODULES = "modules"
@@ -18,8 +19,6 @@ object Config {
     private val mapper = ObjectMapper(YAMLFactory())
             .registerModule(KotlinModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-    private val log = LoggerFactory.getLogger(Config::class.java)
 
     private val moduleTree: JsonNode
     private val modules: MutableMap<Class<*>, Any> = mutableMapOf()
@@ -44,7 +43,7 @@ object Config {
         if (module != null) {
             modules.put(type, module)
         } else {
-            log.debug("Module \"$name\" was not loaded")
+            logger.debug { "Module \"$name\" was not loaded" }
         }
         return module
     }
@@ -69,9 +68,9 @@ object Config {
         try {
             return mapper.treeToValue(tree, type)
         } catch (e: MissingKotlinParameterException) {
-            log.error("Required parameter [${prefix + getPath(e)}] in $CONFIG file is not set")
+            logger.error { "Required parameter [${prefix + getPath(e)}] in $CONFIG file is not set" }
         } catch (e: MismatchedInputException) {
-            log.error("Parameter [${prefix + getPath(e)}] is incorrect type, expected: ${e.targetType}")
+            logger.error { "Parameter [${prefix + getPath(e)}] is incorrect type, expected: ${e.targetType}" }
         }
         return null
     }
@@ -94,7 +93,7 @@ object Config {
         val config = File(CONFIG)
 
         if (!config.exists()) {
-            log.debug("$CONFIG does not exist, creating default config file")
+            logger.debug { "$CONFIG does not exist, creating default config file" }
 
             return getDefaultBytes().let { b ->
                 config.createNewFile()
@@ -105,7 +104,7 @@ object Config {
 
         val bytes = config.readBytes()
         if (bytes.isEmpty()) {
-            log.debug("$CONFIG is empty, copying default config file contents")
+            logger.debug { "$CONFIG is empty, copying default config file contents" }
 
             return getDefaultBytes().let { b ->
                 config.writeBytes(b)

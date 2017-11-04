@@ -1,20 +1,15 @@
-package com.edd.memestream.modules
+package com.edd.memestream.modules.api
 
 import com.edd.memestream.storage.LocalStorageRepository
 import com.edd.memestream.storage.RepositoryManager
 
-abstract class StatefulModule<T>(
-        repositoryManager: RepositoryManager,
-        valueType: Class<T>
-) : Module {
+abstract class StatefulModule<T>(private val stateType: Class<T>) : Module, RepositoryAware {
 
     private companion object {
         const val STATE = "state"
     }
 
-    @Suppress("LeakingThis")
-    private val localRepository: LocalStorageRepository<T> =
-            repositoryManager.local(this::class.java.name, valueType)
+    private lateinit var localRepository: LocalStorageRepository<T>
 
     /**
      * Get currently stored local state.
@@ -28,5 +23,9 @@ abstract class StatefulModule<T>(
      */
     protected fun setState(state: T) {
         localRepository[STATE] = state
+    }
+
+    override fun initRepositories(repositoryManager: RepositoryManager) {
+        localRepository = repositoryManager.local(this::class.java.name, stateType)
     }
 }

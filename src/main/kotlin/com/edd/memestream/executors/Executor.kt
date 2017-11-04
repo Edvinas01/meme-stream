@@ -10,7 +10,12 @@ import java.util.concurrent.TimeUnit
  */
 class Executor {
 
-    private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(Config.executors.poolSize)
+    private companion object {
+        const val THREAD_NAMES = "meme-stream-scheduler"
+    }
+
+    private val executor: ScheduledExecutorService = Executors
+            .newScheduledThreadPool(Config.executors.poolSize) { r -> Thread(r, THREAD_NAMES) }
 
     /**
      * Schedule a job which will run at a fixed rate using the provided interval.

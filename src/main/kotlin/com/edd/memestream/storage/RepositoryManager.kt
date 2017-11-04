@@ -1,7 +1,6 @@
 package com.edd.memestream.storage
 
 import com.edd.memestream.config.Config
-import com.edd.memestream.modules.Module
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.mapdb.DB
