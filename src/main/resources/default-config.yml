@@ -22,10 +22,10 @@ modules:
   printing:
     intervalMillis: 1000
 
-# Thread executor configurations, tweak according to system resources and desired performance.
+# Thread configuration, tweak according to system resources and desired performance.
 executors:
   poolSize: 2
 
-# Database path which is used to store data during and after application shutdowns.
+# Database path which is used to store memes.
 db:
   path: data.db
