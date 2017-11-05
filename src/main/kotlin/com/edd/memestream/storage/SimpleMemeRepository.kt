@@ -33,13 +33,11 @@ class SimpleMemeRepository(
      */
     operator fun get(id: Number): SimpleMeme? {
         val idx = id.toInt()
-        if (idx < 0) {
-            return null
-        }
-
-        synchronized(list) {
-            if (idx < list.size) {
-                return list[idx]
+        if (idx >= 0) {
+            synchronized(list) {
+                if (idx < list.size) {
+                    return list[idx]
+                }
             }
         }
         return null

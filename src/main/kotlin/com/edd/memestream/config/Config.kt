@@ -1,12 +1,14 @@
 package com.edd.memestream.config
 
-import com.fasterxml.jackson.databind.*
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonMappingException
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import mu.KLogging
-import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -92,25 +94,27 @@ object Config : KLogging() {
     private fun loadBytes(): ByteArray {
         val config = File(CONFIG)
 
-        if (!config.exists()) {
+        val bytes = if (!config.exists()) {
             logger.debug { "$CONFIG does not exist, creating default config file" }
 
-            return getDefaultBytes().let { b ->
+            getDefaultBytes().let { b ->
                 config.createNewFile()
                 config.writeBytes(b)
                 b
             }
+        } else {
+            config.readBytes()
         }
 
-        val bytes = config.readBytes()
-        if (bytes.isEmpty()) {
+        return if (bytes.isEmpty()) {
             logger.debug { "$CONFIG is empty, copying default config file contents" }
 
-            return getDefaultBytes().let { b ->
+            getDefaultBytes().let { b ->
                 config.writeBytes(b)
                 b
             }
+        } else {
+            bytes
         }
-        return bytes
     }
 }

@@ -11,11 +11,15 @@ import java.util.concurrent.TimeUnit
 class Executor {
 
     private companion object {
-        const val THREAD_NAMES = "meme-stream-scheduler"
+        const val THREAD_NAME_PREFIX = "meme-stream-"
     }
 
+    private var threadId = 1
+
     private val executor: ScheduledExecutorService = Executors
-            .newScheduledThreadPool(Config.executors.poolSize) { r -> Thread(r, THREAD_NAMES) }
+            .newScheduledThreadPool(Config.executors.poolSize) { r ->
+                Thread(r, "$THREAD_NAME_PREFIX${threadId++}")
+            }
 
     /**
      * Schedule a job which will run at a fixed rate using the provided interval.

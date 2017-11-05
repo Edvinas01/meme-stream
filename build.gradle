@@ -64,12 +64,18 @@ task wrapper(type: Wrapper) {
 }
 
 task detekt(type: JavaExec) {
-    main = "io.gitlab.arturbosch.detekt.cli.Main"
     classpath = configurations.detekt
-    def input = "$projectDir"
-    def config = "$projectDir/detekt.yml"
-    def filters = ".*test.*"
-    def rulesets = ""
-    def params = [ '-i', input, '-c', config, '-f', filters, '-r', rulesets]
+    main = 'io.gitlab.arturbosch.detekt.cli.Main'
+
+    def params = [
+            '-i', "$projectDir",
+            '-c', "$projectDir/.detekt.yml",
+            '-f', '.*test.*',
+    ]
+
     args(params)
+}
+
+clean.doFirst {
+    delete "${rootDir}/out"
 }
