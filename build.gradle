@@ -8,6 +8,7 @@ buildscript {
         kotlinLoggingVersion = '1.4.6'
         twitter4jVersion = '4.0.6'
         jacksonVersion = '2.9.2'
+        detektVersion = '1.0.0.RC5-3'
         kotlinVersion = '1.1.51'
         slf4jVersion = '1.7.25'
         mapDbVersion = '3.0.5'
@@ -22,6 +23,11 @@ buildscript {
 
 repositories {
     mavenCentral()
+    jcenter()
+}
+
+configurations {
+    detekt
 }
 
 dependencies {
@@ -40,8 +46,10 @@ dependencies {
     // Logging dependencies.
     compile "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"
     compile "org.slf4j:slf4j-log4j12:$slf4jVersion"
-//    compile "org.slf4j:slf4j-simple:$slf4jVersion"
     compile "org.slf4j:slf4j-api:$slf4jVersion"
+
+    // Tests and stuff.
+    detekt "io.gitlab.arturbosch.detekt:detekt-cli:$detektVersion"
 }
 
 compileKotlin {
@@ -53,4 +61,15 @@ compileTestKotlin {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.1'
+}
+
+task detekt(type: JavaExec) {
+    main = "io.gitlab.arturbosch.detekt.cli.Main"
+    classpath = configurations.detekt
+    def input = "$projectDir"
+    def config = "$projectDir/detekt.yml"
+    def filters = ".*test.*"
+    def rulesets = ""
+    def params = [ '-i', input, '-c', config, '-f', filters, '-r', rulesets]
+    args(params)
 }
