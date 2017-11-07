@@ -22,6 +22,21 @@ modules:
   printing:
     intervalMillis: 1000
 
+  # Module which forwards memes to discord.
+  discord:
+
+    # How often to try and send the memes.
+    intervalMillis: 1000
+
+    # Discord app authentication details.
+    auth:
+      token:
+
+    # Which channels to send messages to.
+    channels: [
+      general
+    ]
+
 # Thread configuration, tweak according to system resources and desired performance.
 executors:
   poolSize: 2

@@ -6,6 +6,7 @@ group 'doggo-bot'
 buildscript {
     ext {
         kotlinLoggingVersion = '1.4.6'
+        discord4jVersion = '2.9.2'
         twitter4jVersion = '4.0.6'
         jacksonVersion = '2.9.2'
         detektVersion = '1.0.0.RC5-3'
@@ -24,6 +25,8 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
+
+    maven { url 'https://jitpack.io' }
 }
 
 configurations {
@@ -34,6 +37,7 @@ dependencies {
 
     // Core dependencies.
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "com.github.austinv11:Discord4J:$discord4jVersion:shaded"
     compile "org.twitter4j:twitter4j-core:$twitter4jVersion"
 
     // Storage.
@@ -42,6 +46,8 @@ dependencies {
     // JSON and Yaml parsing dependencies.
     compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
 
     // Logging dependencies.
     compile "io.github.microutils:kotlin-logging:$kotlinLoggingVersion"

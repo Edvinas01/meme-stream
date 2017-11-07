@@ -1,13 +1,10 @@
 package com.edd.memestream.modules.print
 
 import com.edd.memestream.config.Config
-import com.edd.memestream.executors.Executor
 import com.edd.memestream.modules.api.SimpleModule
 import mu.KLogging
 
-class PrintingModule(
-        private val executor: Executor
-) : SimpleModule<PrintingState>(PrintingState::class.java) {
+class PrintingModule : SimpleModule<PrintingState>(PrintingState::class.java) {
 
     private companion object: KLogging() {
         init {

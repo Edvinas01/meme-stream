@@ -1,16 +1,13 @@
 package com.edd.memestream.modules.twitter
 
 import com.edd.memestream.config.Config
-import com.edd.memestream.executors.Executor
 import com.edd.memestream.modules.api.SimpleModule
 import com.edd.memestream.storage.SimpleMeme
 import mu.KLogging
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
 
-class TwitterModule(
-        private val executor: Executor
-) : SimpleModule<TwitterState>(TwitterState::class.java) {
+class TwitterModule : SimpleModule<TwitterState>(TwitterState::class.java) {
 
     private companion object : KLogging() {
         init {
