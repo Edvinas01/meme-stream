@@ -5,7 +5,7 @@ import com.edd.memestream.storage.RepositoryManager
 interface RepositoryAware {
 
     /**
-     * Initialize module repositories.
+     * Inject repository manager.
      */
     fun initRepositories(repositoryManager: RepositoryManager)
 }

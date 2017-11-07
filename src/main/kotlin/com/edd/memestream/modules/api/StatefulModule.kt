@@ -1,15 +1,18 @@
 package com.edd.memestream.modules.api
 
+import com.edd.memestream.executors.Executor
 import com.edd.memestream.storage.LocalStorageRepository
 import com.edd.memestream.storage.RepositoryManager
 
-abstract class StatefulModule<T>(private val stateType: Class<T>) : Module, RepositoryAware {
+abstract class StatefulModule<T>(private val stateType: Class<T>)
+    : Module, RepositoryAware {
 
     private companion object {
         const val STATE = "state"
     }
 
     private lateinit var localRepository: LocalStorageRepository<T>
+    private lateinit var executor: Executor
 
     /**
      * Get currently stored local state.
