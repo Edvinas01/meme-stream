@@ -1,16 +1,13 @@
 package com.edd.memestream.modules.twitter
 
 import com.edd.memestream.config.Config
-import com.edd.memestream.executors.Executor
 import com.edd.memestream.modules.api.SimpleModule
 import com.edd.memestream.storage.SimpleMeme
 import mu.KLogging
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
 
-class TwitterModule(
-        private val executor: Executor
-) : SimpleModule<TwitterState>(TwitterState::class.java) {
+class TwitterModule : SimpleModule<TwitterState>(TwitterState::class.java) {
 
     private companion object : KLogging() {
         init {
@@ -34,14 +31,19 @@ class TwitterModule(
 
                 for (user in users) {
                     with(twitter.showUser(user).status) {
-                        mediaEntities.map {
-                            SimpleMeme(it.mediaURL)
-                        }.firstOrNull()?.let { meme ->
+                        val url = mediaEntities.map {
+                            it.expandedURL
+                        }.firstOrNull()
 
-                            if (state.previousUserMeme[user] != meme) {
-                                state.previousUserMeme[user] = meme
-                                pending += meme
-                            }
+                        val meme = if (url == null) {
+                            SimpleMeme("https://twitter.com/$user/status/$id")
+                        } else {
+                            SimpleMeme(url)
+                        }
+
+                        if (state.previousUserMeme[user] != meme) {
+                            state.previousUserMeme[user] = meme
+                            pending += meme
                         }
                     }
                 }
