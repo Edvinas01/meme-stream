@@ -18,5 +18,6 @@ gradlew.bat build
 Then make your changes, test them out and submit your pull request.
 
 Some things to consider:
+* If `detekt` is complaining too about random stuff, edit [.detekt.yml](.detekt.yml) config file.
 * No code style is enforced as long as existing files are not altered.
 * Tests are not required but are welcome.
