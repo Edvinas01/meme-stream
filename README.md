@@ -4,7 +4,7 @@ For all your meme streaming needs.
 ## What is this?
 Meme stream grabs media from various external sources and stores them inside an internal db. When the time is right, the internal db is accessed and its contents are forwarded to sources of your choice.
 
-## Building
+## Building and executable
 So you want to build this bad boy? First you're gonna need the latest `JDK 8` version. Then, after checking out the project, navigate to root directory and run:
 ```
 ./gradlew shadowJar
@@ -18,7 +18,7 @@ gradlew.bat shadowJar
 This will create an executable `.jar` file which you'll be able to run. You will find this file under `build/libs`.
 
 ## Running
-After you've build the project, simply execute the `.jar` file:
+After you've built the project, simply execute the `.jar` file:
 ```
 java -jar meme-stream-<version>-all.jar
 ``` 
