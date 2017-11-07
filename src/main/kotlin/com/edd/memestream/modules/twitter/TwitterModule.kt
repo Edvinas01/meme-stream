@@ -31,14 +31,19 @@ class TwitterModule : SimpleModule<TwitterState>(TwitterState::class.java) {
 
                 for (user in users) {
                     with(twitter.showUser(user).status) {
-                        mediaEntities.map {
-                            SimpleMeme(it.mediaURL)
-                        }.firstOrNull()?.let { meme ->
+                        val url = mediaEntities.map {
+                            it.expandedURL
+                        }.firstOrNull()
 
-                            if (state.previousUserMeme[user] != meme) {
-                                state.previousUserMeme[user] = meme
-                                pending += meme
-                            }
+                        val meme = if (url == null) {
+                            SimpleMeme("https://twitter.com/$user/status/$id")
+                        } else {
+                            SimpleMeme(url)
+                        }
+
+                        if (state.previousUserMeme[user] != meme) {
+                            state.previousUserMeme[user] = meme
+                            pending += meme
                         }
                     }
                 }
