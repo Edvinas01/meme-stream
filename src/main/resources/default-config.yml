@@ -1,9 +1,12 @@
 modules:
 
-  # Twitter module pulls data from various twitter users and stores it in db.
+  #
+  # Module which pulls data from various twitter users and stores it in db.
+  #
   twitter:
 
-    # Twitter developer authentication keys.
+    # Twitter authentication details.
+    # See https://apps.twitter.com/
     auth:
       oauthAccessTokenSecret:
       oauthAccessToken:
@@ -18,29 +21,34 @@ modules:
       shitpostbot5000
     ]
 
-  # Simple module used for testing purposes.
-  printing:
-    intervalMillis: 1000
-
-  # Module which forwards memes to discord.
+  #
+  # Module which forwards data to discord.
+  #
   discord:
 
-    # How often to try and send the memes.
+    # How often to try to send the data.
     intervalMillis: 1000
 
     # Discord app authentication details.
+    # See https://discordapp.com/developers/applications/me
     auth:
       token:
 
-    # Which channels to send messages to.
+    # Which channels to send data to.
     channels: [
       general
     ]
+
+  #
+  # Testing module which prints data from db to console.
+  #
+  printing:
+    intervalMillis: 1000
 
 # Thread configuration, tweak according to system resources and desired performance.
 executors:
   poolSize: 2
 
-# Database path which is used to store memes.
+# Database path which is used to store data.
 db:
   path: data.db

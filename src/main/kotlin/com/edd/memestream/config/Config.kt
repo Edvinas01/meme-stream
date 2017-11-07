@@ -45,7 +45,7 @@ object Config : KLogging() {
         if (module != null) {
             modules.put(type, module)
         } else {
-            logger.debug { "Module \"$name\" was not loaded" }
+            logger.debug { "Module configuration \"$name\" was not loaded" }
         }
         return module
     }
@@ -70,9 +70,9 @@ object Config : KLogging() {
         try {
             return mapper.treeToValue(tree, type)
         } catch (e: MissingKotlinParameterException) {
-            logger.error { "Required parameter [${prefix + getPath(e)}] in $CONFIG file is not set" }
+            logger.warn { "Required parameter [${prefix + getPath(e)}] in $CONFIG file is not set" }
         } catch (e: MismatchedInputException) {
-            logger.error { "Parameter [${prefix + getPath(e)}] is incorrect type, expected: ${e.targetType}" }
+            logger.warn { "Parameter [${prefix + getPath(e)}] is incorrect type, expected: ${e.targetType}" }
         }
         return null
     }
